@@ -1,12 +1,16 @@
 const express = require('express')
 const https = require('https');
+const uuid = require('uuid');
+const bodyParser = require('body-parser');
 const api = require('./api');
 const app = express();
 const axios = require('axios');
 const config = require('./config');
 const models = require('./models');
 
-if(config.ALLOW_ALL_ORIGIN){
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+if(config.ALLOW_ALL_ORIGIN) {
     app.use(function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -32,12 +36,78 @@ app.get('/search', (req, res, next) => {
     .then(next)
     .catch(((e)=>{
         console.error(e);
+        next(e);
     }));
 });
+
+app.get('/view', (req, res, next) => {
+    console.log('View: '+req.query.nickname);
+    models.User.findAll({
+        where: {
+            nickname: req.query.nickname
+        }
+    }).then(users => {
+        let userinfo = [];
+        for(let i in users){
+            let user = users[i];
+            console.log(user.toJSON());
+            userinfo.push(user.toJSON());
+        }
+        res.json(userinfo);
+    })
+    .then(next)
+    .catch(((e)=>{
+        console.error(e);
+        next(e);
+    }));
+});
+
+app.post('/wx-auth', (req, res, next) => {
+    console.log('Wx Auth: ', req.body);
+    var token = uuid.v1();
+    models.UserAuthInfo.sync({force: false})
+    .then(models.UserAuthInfo.create({
+        token,
+        userinfo: req.body
+    }).then(userAuthInfo => {
+        console.log(userAuthInfo.toJSON());
+        res.json({
+            token
+        });
+    }))
+    .then(next)
+    .catch(((e)=>{
+        console.error("Error:", e);
+        next(e);
+    }));
+});
+
+app.get('/login', (req, res, next) => {
+    let token = req.query.token;
+    console.log('Token: ' + token);
+    models.UserAuthInfo.sync({force: false})
+    .then(models.UserAuthInfo.findAll({
+            where: {
+                token
+            }
+        }).then(userAuthInfos => {
+            console.log(userAuthInfos);
+            if(userAuthInfos && userAuthInfos.length == 0){
+                throw "No such token";
+            }
+            res.json(userAuthInfos[0].toJSON());
+        })
+    ).then(next)
+    .catch(((e)=>{
+        console.error(e);
+        next(e);
+    }));
+});
+
 const sendMsgHandler = (req, res, next) => {
     let openid = req.query.openid;
     let message = req.query.message;
-    if(!req.query.fromUnionID || !openid || !message){
+    if(!req.query.fromOpenid || !openid || !message){
         return next();
     }
     console.log('Send msg to: '+openid);
@@ -55,7 +125,7 @@ const sendMsgHandler = (req, res, next) => {
         let user = users[0];
         console.log("User: ", user.toJSON());
         models.Request.create({
-            fromUnionID: req.query.fromUnionID,
+            fromOpenid: req.query.fromOpenid,
             toOpenid: openid,
             message,
             status: "pending"

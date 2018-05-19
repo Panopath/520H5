@@ -18,8 +18,10 @@
   "homepage": "https://github.com/Panopath/520H5#readme",
   "dependencies": {
     "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "mysql2": "^1.5.3",
-    "sequelize": "^4.37.7"
+    "sequelize": "^4.37.7",
+    "uuid": "^3.2.1"
   }
 }

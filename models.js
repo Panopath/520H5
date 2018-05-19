@@ -19,12 +19,20 @@ module.exports = {
         headimgurl: Sequelize.STRING
     }),
     Request: sequelize.define('request', {
-        fromUnionID: Sequelize.STRING,
+        fromOpenid: Sequelize.STRING,
         toOpenid: Sequelize.STRING,
         message: Sequelize.STRING,
         status: {
             type:   Sequelize.ENUM,
             values: ['pending', 'yes', 'no']
         }
+    }),
+    UserAuthInfo: sequelize.define('user-auth-info', {
+        token: {
+            type:Sequelize.DataTypes.UUID,
+            allowNull: false,
+            unique: true
+        },
+        userinfo: Sequelize.JSON
     })
 }
