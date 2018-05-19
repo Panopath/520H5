@@ -29,6 +29,9 @@ module.exports = {
             /* console.log('statusCode:', res.status);
             console.log('headers:', res.headers);
             console.log('Data: ',res.data); */
+            if(!res.data){
+                throw "No res data found " + JSON.stringify(res);
+            }
             config.token = res.data.token;
             console.log("Got token "+config.token);
         })
