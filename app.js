@@ -34,10 +34,10 @@ app.get('/search', (req, res, next) => {
         console.error(e);
     }));
 });
-
-app.get('/sendMsg', (req, res, next) => {
+const sendMsgHandler = (req, res, next) => {
     let openid = req.query.openid;
-    if(!req.query.fromUnionID || !openid){
+    let message = req.query.message;
+    if(!req.query.fromUnionID || !openid || !message){
         return next();
     }
     console.log('Send msg to: '+openid);
@@ -53,12 +53,18 @@ app.get('/sendMsg', (req, res, next) => {
             throw "User not found";
         }
         let user = users[0];
-        console.log(user.toJSON());
+        console.log("User: ", user.toJSON());
         models.Request.create({
             fromUnionID: req.query.fromUnionID,
             toOpenid: openid,
+            message,
             status: "pending"
         })
+        .then(api.getAccessToken()
+        .then(res => {
+            config.token = res.data.token;
+            console.log("Got token "+config.token);
+        }))
         .then(api.sendMessage(openid, {
             "first": {
                 "value":"你好，你的2018.5.20表白情况如下：",
@@ -96,7 +102,10 @@ app.get('/sendMsg', (req, res, next) => {
         console.error(e);
         next(e);
     });
-});
+};
+
+app.post('/sendMsg', sendMsgHandler);
+app.get('/sendMsg', sendMsgHandler);
 
 
 // If you call refreshUserInfo in initialization then it would be fine not to use the code below to get token

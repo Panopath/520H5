@@ -21,6 +21,7 @@ module.exports = {
     Request: sequelize.define('request', {
         fromUnionID: Sequelize.STRING,
         toOpenid: Sequelize.STRING,
+        message: Sequelize.STRING,
         status: {
             type:   Sequelize.ENUM,
             values: ['pending', 'yes', 'no']
