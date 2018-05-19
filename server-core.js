@@ -76,7 +76,7 @@ app.get('/view', (req, res, next) => {
         toOpenid: req.query.openid
     }})
     .then(requests => {
-        retData.from = requests.map((e)=>(e.toJSON()));
+        retData.to = requests.map((e)=>(e.toJSON()));
     })
     .then(()=>models.Request.findAll({
         where: {
@@ -86,7 +86,7 @@ app.get('/view', (req, res, next) => {
         }
     }))
     .then(requests => {
-        retData.from = retData.from.concat(requests.map((e)=>(e.toJSON())));
+        retData.to = retData.to.concat(requests.map((e)=>(e.toJSON())));
     })
     .then(()=>
         models.Request.findAll({
@@ -96,7 +96,7 @@ app.get('/view', (req, res, next) => {
         })
     )
     .then(requests => {
-        retData.to = requests.map((e)=>(e.toJSON()));
+        retData.from = requests.map((e)=>(e.toJSON()));
     })
     .then(()=>{
         res.json(retData);
@@ -140,7 +140,8 @@ app.get('/login', (req, res, next) => {
             throw "No such token";
         }
         let userAuthInfo = userAuthInfos[0].toJSON()
-        delete userAuthInfo.access_token;
+        userAuthInfo.access_token = "";
+        delete userAuthInfo.userinfo.access_token;
         res.json(userAuthInfo);
     }).then(next)
     .catch(((e)=>{
