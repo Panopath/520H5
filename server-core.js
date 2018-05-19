@@ -29,8 +29,8 @@ app.get('/approve', (req, res, next) => {
         }
     }).then(requests => {
         if(requests.length == 1){
-            request[0].status = "yes";
-            request[0].save();
+            requests[0].status = "yes";
+            requests[0].save();
             res.json({ret: 0});
         }else{
             throw "Request not unique";
