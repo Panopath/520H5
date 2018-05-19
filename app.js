@@ -68,7 +68,7 @@ app.post('/wx-auth', (req, res, next) => {
     models.UserAuthInfo.sync({force: false})
     .then(models.UserAuthInfo.create({
         token,
-        userinfo: req.body
+        userinfo: Object.assign({}, req.body, {access_token: ""})
     }).then(userAuthInfo => {
         console.log(userAuthInfo.toJSON());
         res.json({
