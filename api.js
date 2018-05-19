@@ -17,7 +17,7 @@ module.exports = {
         {
             "touser":openid,
             template_id,
-            "url":"http://file.panopath.com/520h5",
+            "url":"http://file.panopath.com/520H5",
             "topcolor":"#FF0000",
             data
         });
