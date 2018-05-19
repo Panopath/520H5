@@ -6,6 +6,14 @@ const axios = require('axios');
 const config = require('./config');
 const models = require('./models');
 
+if(config.ALLOW_ALL_ORIGIN){
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
+}
+
 app.get('/search', (req, res, next) => {
     console.log('Search for: '+req.query.nickname);
     models.User.findAll({

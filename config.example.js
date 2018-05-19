@@ -10,6 +10,7 @@ module.exports = {
     DB_USERNAME:'',
     DB_PASSWORD:'',
     TEMPLATE_ID: '',
+    ALLOW_ALL_ORIGIN: false,
     pool: {
         max: 5,
         min: 0,
