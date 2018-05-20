@@ -24,16 +24,16 @@ app.get('/approve', (req, res, next) => {
     models.Request.findAll({
         where: {
             toOpenid: req.query.toOpenid,
-            fromOpenid: req.query.toOpenid,
+            fromOpenid: req.query.fromOpenid,
             id: req.query.id,
         }
     }).then(requests => {
-        if(requests.length == 1){
+        if(requests.length != 0){
             requests[0].status = "yes";
             requests[0].save();
             res.json({ret: 0});
         }else{
-            throw "Request not unique";
+            throw "Request not found";
         }
     })
     .then(next)
@@ -212,7 +212,7 @@ const sendMsgHandler = (req, res, next) => {
         }
     })
     .then((res2) => {
-        if((!res2.data || res2.data.errcode != 0)){
+        if(!res2.data || res2.data.errcode != 0){
             console.log(res2);
         }
         res.json({ret: 0});
